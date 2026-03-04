@@ -14,7 +14,7 @@ struct BabyAvatarView: View {
     let photoFilename: String?
     let size: CGFloat
     
-    @State private var profileImage: NSImage?
+    @State private var profileImage: PlatformImage?
     
     init(name: String, photoFilename: String? = nil, size: CGFloat = 100) {
         self.name = name
@@ -34,11 +34,19 @@ struct BabyAvatarView: View {
             .frame(width: size, height: size)
             .overlay {
                 if let profileImage = profileImage {
+                    #if canImport(UIKit)
+                    Image(uiImage: profileImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: size, height: size)
+                        .clipShape(Circle())
+                    #elseif canImport(AppKit)
                     Image(nsImage: profileImage)
                         .resizable()
                         .scaledToFill()
                         .frame(width: size, height: size)
                         .clipShape(Circle())
+                    #endif
                 } else {
                     Text(String(name.prefix(1).uppercased()))
                         .font(.system(size: size * 0.4, weight: .bold))
